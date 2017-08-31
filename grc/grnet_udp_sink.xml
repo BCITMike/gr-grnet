@@ -4,7 +4,7 @@
   <key>grnet_udp_sink</key>
   <category>[GrNet Networking Tools]</category>
   <import>import grnet</import>
-  <make>grnet.udp_sink($type.size, $vlen, $addr, $port,$header)</make>
+  <make>grnet.udp_sink($type.size, $vlen, $addr, $port,$header, $psize)</make>
 	<param>
 		<name>Input Type</name>
 		<key>type</key>
@@ -70,6 +70,13 @@
 			<key>3</key>
 		</option>
 	</param>
+  <param>
+		<name>Payload Size</name>
+		<key>psize</key>
+		<value>1472</value>
+		<type>int</type>
+	</param>
+
 	<param>
 		<name>Vec Length</name>
 		<key>vlen</key>

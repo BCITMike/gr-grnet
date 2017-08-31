@@ -30,20 +30,20 @@ namespace gr {
   namespace grnet {
 
     udp_sink::sptr
-    udp_sink::make(size_t itemsize,size_t vecLen,const std::string &host, int port,int headerType)
+    udp_sink::make(size_t itemsize,size_t vecLen,const std::string &host, int port,int headerType, int payload_size)
     {
       return gnuradio::get_initial_sptr
-        (new udp_sink_impl(itemsize, vecLen,host, port,headerType));
+        (new udp_sink_impl(itemsize, vecLen,host, port,headerType,payload_size));
     }
 
     /*
      * The private constructor
      */
-    udp_sink_impl::udp_sink_impl(size_t itemsize,size_t vecLen,const std::string &host, int port,int headerType)
+    udp_sink_impl::udp_sink_impl(size_t itemsize,size_t vecLen,const std::string &host, int port,int headerType, int payload_size)
       : gr::sync_block("udp_sink",
               gr::io_signature::make(1, 1, itemsize*vecLen),
               gr::io_signature::make(0, 0, 0)),
-    d_itemsize(itemsize), d_veclen(vecLen),d_header_type(headerType),d_seq_num(0),d_header_size(0)
+    d_itemsize(itemsize), d_veclen(vecLen),d_header_type(headerType),d_seq_num(0),d_header_size(0),d_payload_size(payload_size)
     {
     	d_block_size = d_itemsize * d_veclen;
 
@@ -99,21 +99,21 @@ namespace gr {
     {
         gr::thread::scoped_lock guard(d_mutex);
 
-        int maxDataSize=1472;
+        int maxDataSize=d_payload_size;
         switch (d_header_type) {
         	case HEADERTYPE_NONE:
-        		maxDataSize=1472;
+        		maxDataSize=maxDataSize;
         	break;
         	case HEADERTYPE_SEQNUM:
-        		maxDataSize = 1472 - 8;
+        		maxDataSize = maxDataSize - 8;
         	break;
 
         	case HEADERTYPE_SEQPLUSSIZE:
-        		maxDataSize = 1472 - 12;
+        		maxDataSize = maxDataSize - 12;
         	break;
 
         	case HEADERTYPE_SEQSIZECRC:
-        		maxDataSize = 1472 - 12 - sizeof(unsigned long);
+        		maxDataSize = maxDataSize - 12 - sizeof(unsigned long);
         	break;
         }
 
@@ -199,18 +199,18 @@ namespace gr {
         int maxDataSize=1472;
         switch (d_header_type) {
         	case HEADERTYPE_NONE:
-        		maxDataSize=1472;
+        		maxDataSize=d_payload_size;
         	break;
         	case HEADERTYPE_SEQNUM:
-        		maxDataSize = 1472 - 8;
+        		maxDataSize = maxDataSize - 8;
         	break;
 
         	case HEADERTYPE_SEQPLUSSIZE:
-        		maxDataSize = 1472 - 12;
+        		maxDataSize = maxDataSize - 12;
         	break;
 
         	case HEADERTYPE_SEQSIZECRC:
-        		maxDataSize = 1472 - 12 - sizeof(unsigned long);
+        		maxDataSize = maxDataSize - 12 - sizeof(unsigned long);
         	break;
         }
 
