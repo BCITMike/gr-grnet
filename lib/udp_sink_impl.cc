@@ -196,7 +196,7 @@ namespace gr {
     {
         gr::thread::scoped_lock guard(d_mutex);
 
-        int maxDataSize=1472;
+        int maxDataSize=d_payload_size;
         switch (d_header_type) {
         	case HEADERTYPE_NONE:
         		maxDataSize=d_payload_size;
